@@ -1,13 +1,8 @@
-from typing import Any, Optional
-
+from typing import Any
 import dlt
 from dlt.common.pendulum import pendulum
-from dlt.sources.rest_api import (
-    RESTAPIConfig,
-    check_connection,
-    rest_api_resources,
-    rest_api_source,
-)
+from dlt.sources.rest_api import RESTAPIConfig, rest_api_resources
+
 
 
 @dlt.source(name="github")
@@ -17,15 +12,13 @@ def github_source() -> Any:
     config: RESTAPIConfig = {
         "client": {
             "base_url": "https://api.github.com/repos/dlt-hub/dlt/",
-            # we add an auth config if the auth token is present
             "auth": (
                 {
                     "type": "bearer",
-                    "token": dlt.secrets.get("sources.github.access_token")
+                    "token": dlt.secrets.get("sources.github.access_token"),
                 }
             ),
         },
-        # The default configuration for all resources and their endpoints
         "resource_defaults": {
             "primary_key": "id",
             "write_disposition": "merge",
@@ -66,7 +59,9 @@ def github_source() -> Any:
                     # and the initial value
                     "incremental": {
                         "cursor_path": "updated_at",
-                        "initial_value": pendulum.today().subtract(days=30).to_iso8601_string(),
+                        "initial_value": pendulum.today()
+                        .subtract(days=30)
+                        .to_iso8601_string(),
                     },
                 },
             },
@@ -92,60 +87,12 @@ def github_source() -> Any:
     yield from rest_api_resources(config)
 
 
-def load_github() -> None:
+if __name__ == "__main__":
     pipeline = dlt.pipeline(
         pipeline_name="rest_api_github",
-        destination='duckdb',
+        destination="duckdb",
         dataset_name="rest_api_data",
     )
-
     load_info = pipeline.run(github_source())
-    print(load_info)  # noqa: T201
 
-
-def load_pokemon() -> None:
-    pipeline = dlt.pipeline(
-        pipeline_name="rest_api_pokemon",
-        destination='duckdb',
-        dataset_name="rest_api_data",
-    )
-
-    pokemon_source = rest_api_source(
-        {
-            "client": {
-                "base_url": "https://pokeapi.co/api/v2/",
-                # If you leave out the paginator, it will be inferred from the API:
-                # "paginator": "json_link",
-            },
-            "resource_defaults": {
-                "endpoint": {
-                    "params": {
-                        "limit": 1000,
-                    },
-                },
-            },
-            "resources": [
-                "pokemon",
-                "berry",
-                "location",
-            ],
-        }
-    )
-
-    def check_network_and_authentication() -> None:
-        (can_connect, error_msg) = check_connection(
-            pokemon_source,
-            "not_existing_endpoint",
-        )
-        if not can_connect:
-            pass  # do something with the error message
-
-    check_network_and_authentication()
-
-    load_info = pipeline.run(pokemon_source)
-    print(load_info)  # noqa: T201
-
-
-if __name__ == "__main__":
-    load_github()
-    load_pokemon()
+    print(load_info)

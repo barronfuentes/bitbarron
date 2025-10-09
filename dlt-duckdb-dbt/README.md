@@ -18,11 +18,12 @@ uv sync
 ### Run dlt Pipeline
 
 ```bash
+export SOURCES__GITHUB__ACCESS_TOKEN="<YOUR_GITHUB_PAT>"
 python rest_api_pipeline.py
 ```
 
 ### View dlt Dashboard
 
 ```bash
-dlt pipeline rest_api_pokemon show
+dlt pipeline rest_api_github show
 ```
