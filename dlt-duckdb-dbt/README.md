@@ -4,6 +4,18 @@
 * duckdb - In-process SQL database for analytical queries on local data
 * dbt - Framework for transforming data in duckdb for consumption
 
+```mermaid
+graph LR
+    A[GitHub REST API] -->|dlt pipeline| B[(DuckDB Raw Data)]
+    B -->|dbt transform| C[(DuckDB Models)]
+    C -->|copy to| D[(S3 Storage)]
+    
+    style A fill:#e1f5fe
+    style B fill:#e8f5e9
+    style C fill:#e8f5e9
+    style D fill:#ede7f6
+```
+
 ## Setup
 
 ### Install dependencies
