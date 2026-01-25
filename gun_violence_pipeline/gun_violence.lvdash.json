@@ -1,0 +1,116 @@
+{
+  "datasets": [
+    {
+      "name": "e946e588",
+      "displayName": "Gun Violence Clean Record Count",
+      "queryLines": [
+        "select count(*) as clean_records from workspace.barronfuentes.gun_violence_clean;"
+      ]
+    },
+    {
+      "name": "6bce2556",
+      "displayName": "Gun Violence Quarantine Record Count",
+      "queryLines": [
+        "select count(*) as quarantine_records from workspace.barronfuentes.gun_violence_quarantine;"
+      ]
+    },
+    {
+      "name": "5d39408b",
+      "displayName": "SQL Data Preparation Example",
+      "queryLines": [
+        "select\n",
+        "  (select count(*) from workspace.barronfuentes.gun_violence_clean) as clean_records,\n",
+        "  (select count(*) from workspace.barronfuentes.gun_violence_quarantine) as quarantined_records"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "a01f37b1",
+      "displayName": "Data Quality",
+      "layout": [
+        {
+          "widget": {
+            "name": "total-quarantine-records",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5d39408b",
+                  "fields": [
+                    {
+                      "name": "clean_records",
+                      "expression": "`clean_records`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "clean_records"
+                }
+              },
+              "frame": {
+                "title": "Total Quarantine Records",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "4c5e58a9",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "5d39408b",
+                  "fields": [
+                    {
+                      "name": "sum(quarantined_records)",
+                      "expression": "SUM(`quarantined_records`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(quarantined_records)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 3,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

@@ -1,0 +1,20 @@
+# The main pipeline for gun_violence_pipeline
+
+resources:
+  pipelines:
+    gun_violence_pipeline_etl:
+      name: gun_violence_pipeline_etl
+      catalog: ${var.catalog}
+      schema: ${var.schema}
+      serverless: true
+      root_path: "../src/gun_violence_pipeline_etl"
+
+      libraries:
+        - glob:
+            include: ../src/gun_violence_pipeline_etl/transformations/**
+
+      environment:
+        dependencies:
+          # We include every dependency defined by pyproject.toml by defining an editable environment
+          # that points to the folder where pyproject.toml is deployed.
+          - --editable ${workspace.file_path}
