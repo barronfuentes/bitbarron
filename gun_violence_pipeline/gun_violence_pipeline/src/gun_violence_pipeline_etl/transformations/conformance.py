@@ -4,8 +4,35 @@ from pyspark.sql.types import DateType
 
 SOURCE_STREAMING_TABLE = "workspace.default.gun_violence"
 
+PRIMITIVE_CASTS = {
+    "incident_id": "INT",
+    "n_killed": "INT",
+    "n_injured": "INT",
+    "congressional_district": "INT",
+    "state_house_district": "INT",
+    "state_senate_district": "INT",
+    "n_guns_involved": "INT",
+    "latitude": "FLOAT",
+    "longitude": "FLOAT",
+    "incident_url_fields_missing": "BOOLEAN",
+    "date": "STRING",
+    "state": "STRING",
+    "city_or_county": "STRING",
+    "address": "STRING",
+    "incident_url": "STRING",
+    "source_url": "STRING",
+}
+
 def _try_cast(col_name: str, spark_sql_type: str) -> F.Column:
     return F.expr(f"TRY_CAST({col_name} AS {spark_sql_type})")
+
+def _apply_primitive_casts(df):
+    for col, sql_type in PRIMITIVE_CASTS.items():
+        if sql_type in {"STRING"}:
+            df = df.withColumn(col, F.col(col).cast("string"))
+        else:
+            df = df.withColumn(col, _try_cast(col, sql_type))
+    return df
 
 def _parse_map_int_key(col_name: str, value_sql_type: str) -> F.Column:
     # Handles JSON maps OR "0::Unknown||1::Stolen" style. Never CASTs STRING->MAP.
@@ -106,24 +133,7 @@ def staged_quarantine():
     )
 
     # Canonical primitive casting
-    df = (df
-          .withColumn("incident_id", _try_cast("incident_id", "INT"))
-          .withColumn("n_killed", _try_cast("n_killed", "INT"))
-          .withColumn("n_injured", _try_cast("n_injured", "INT"))
-          .withColumn("congressional_district", _try_cast("congressional_district", "INT"))
-          .withColumn("state_house_district", _try_cast("state_house_district", "INT"))
-          .withColumn("state_senate_district", _try_cast("state_senate_district", "INT"))
-          .withColumn("n_guns_involved", _try_cast("n_guns_involved", "INT"))
-          .withColumn("latitude", _try_cast("latitude", "FLOAT"))
-          .withColumn("longitude", _try_cast("longitude", "FLOAT"))
-          .withColumn("incident_url_fields_missing", _try_cast("incident_url_fields_missing", "BOOLEAN"))
-          .withColumn("date", F.col("date").cast("string"))
-          .withColumn("state", F.col("state").cast("string"))
-          .withColumn("city_or_county", F.col("city_or_county").cast("string"))
-          .withColumn("address", F.col("address").cast("string"))
-          .withColumn("incident_url", F.col("incident_url").cast("string"))
-          .withColumn("source_url", F.col("source_url").cast("string"))
-    )
+    df = _apply_primitive_casts(df)
 
     # Parsed date (required)
     df = df.withColumn(
