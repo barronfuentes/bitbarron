@@ -1,0 +1,1 @@
+"""Column sync CLI package."""

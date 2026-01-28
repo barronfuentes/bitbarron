@@ -1,7 +1,7 @@
 # PRD: Column Definition Automation (CLI + Databricks REST/dbutils)
 
 ## Overview
-Build a CLI tool that reads the data dictionary from `college_scorecard_pipeline/metadata/data.yaml` and programmatically updates column descriptions (comments) in Databricks Unity Catalog via the Databricks REST API (preferred) or `dbutils` in a notebook context.
+Build a CLI tool that reads the data dictionary from `college_scorecard_pipeline/metadata/data.yaml` and programmatically updates column descriptions (comments) in Databricks Unity Catalog via the Databricks REST API.
 
 ## Goals
 - Keep Unity Catalog column descriptions in sync with the YAML data dictionary.
