@@ -5,7 +5,7 @@ description = "a CLI tool that reads the data dictionary from `college_scorecard
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
 dependencies = [
-    # Runtime dependencies go here
+    "PyYAML>=6.0",
 ]
 
 authors = [{ name = "barronfuentes@gmail.com" }]

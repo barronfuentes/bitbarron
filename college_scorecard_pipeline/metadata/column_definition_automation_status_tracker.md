@@ -61,8 +61,9 @@ Rules:
 | 1.2 | Document YAML schema used by `data.yaml` |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/data_yaml_schema.md` | Documented observed top-level keys, dictionary entry fields, and files schema. |
 | 2.1 | Create a CLI entrypoint and argument parser |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/cli.py`, `college_scorecard_pipeline/metadata/src/column_sync/__main__.py` | Added argparse CLI scaffolding with required catalog/schema/table/yaml and core flags. |
 | 2.2 | Add config loading for Databricks host/auth |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/config.py`, `college_scorecard_pipeline/metadata/src/column_sync/cli.py` | Uses `DATABRICKS_HOST` plus `DATABRICKS_TOKEN` or `DATABRICKS_PROFILE`. |
-| 3.1 | Parse dictionary entries and normalize column names |  | Not Started |  |  |  |  |
-| 3.2 | Validate required fields (`source`, `description`) |  | Not Started |  |  |  |  |
+| 3.1 | Parse dictionary entries and normalize column names |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/dictionary.py`, `college_scorecard_pipeline/metadata/pyproject.toml` | Added YAML parser with normalized source names; PyYAML dependency registered. |
+| 3.2 | Validate required fields (`source`, `description`) |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/dictionary.py` | Added required-field validation with clear error messages; defaulted loader to validate. |
+| 3.3 | Wire dictionary loader into CLI to surface validation errors |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/cli.py` | CLI now loads dictionary at startup, surfacing validation errors before updates. |
 | 4.1 | Query current column comments from Unity Catalog |  | Not Started |  |  |  |  |
 | 4.2 | Build a comparison map of existing vs desired comments |  | Not Started |  |  |  |  |
 | 5.1 | Implement REST call(s) to update column comments |  | Not Started |  |  |  |  |
@@ -72,7 +73,7 @@ Rules:
 | 6.2 | Ensure filters are applied before any updates |  | Not Started |  |  |  |  |
 | 7.1 | Print summary counts (updated/skipped/errors) |  | Not Started |  |  |  |  |
 | 7.2 | Optional report file with per-column outcome |  | Not Started |  |  |  |  |
-| 8.1 | Unit tests for YAML parsing and diff logic |  | Not Started |  |  |  |  |
+| 8.1 | Unit tests for YAML parsing and diff logic |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/tests/test_dictionary.py` | Added pytest coverage for YAML parsing, normalization, and validation error paths. |
 | 8.2 | Mock API tests for update calls |  | Not Started |  |  |  |  |
 | 9.1 | Update README with CLI usage, examples, and auth setup |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/README.md` | Added uv build steps and CLI usage with profile override examples. |
 

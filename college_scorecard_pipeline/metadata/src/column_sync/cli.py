@@ -7,6 +7,7 @@ import logging
 from typing import Sequence
 
 from column_sync.config import load_databricks_config, validate_databricks_credentials
+from column_sync.dictionary import load_dictionary_entries
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -92,6 +93,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.schema,
         args.table,
     )
+    entries = load_dictionary_entries(args.yaml)
+    logger.info("Loaded %s dictionary entries from %s.", len(entries), args.yaml)
     # Functionality is implemented in later tasks.
     return 0
 

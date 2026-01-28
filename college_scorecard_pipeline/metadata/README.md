@@ -33,3 +33,13 @@ python -m column_sync \
   --table college_scorecard \
   --yaml data.yaml
 ```
+
+## Run unit tests
+
+From `college_scorecard_pipeline/metadata`:
+
+```bash
+uv venv
+uv pip install -e ".[dev]"
+uv run pytest
+```
