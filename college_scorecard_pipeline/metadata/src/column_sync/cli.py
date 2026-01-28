@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import logging
 from typing import Sequence
+
+from column_sync.config import load_databricks_config, validate_databricks_credentials
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -55,6 +58,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional path to write a JSON report of outcomes.",
     )
     parser.add_argument(
+        "--profile",
+        default=None,
+        help="Databricks CLI profile name from ~/.databrickscfg (default: DEFAULT).",
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         help="Logging level (e.g., INFO, DEBUG).",
@@ -72,7 +80,18 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint."""
 
-    _ = parse_args(argv)
+    args = parse_args(argv)
+    logging.basicConfig(level=args.log_level.upper())
+    logger = logging.getLogger(__name__)
+    # Load config now to validate auth/host early.
+    config = load_databricks_config(args.profile)
+    validate_databricks_credentials(config, args.catalog, args.schema, args.table)
+    logger.info(
+        "Validated Databricks credentials and found table %s.%s.%s.",
+        args.catalog,
+        args.schema,
+        args.table,
+    )
     # Functionality is implemented in later tasks.
     return 0
 

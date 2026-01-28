@@ -60,7 +60,7 @@ Rules:
 | 1.1 | Confirm target tables and Unity Catalog naming conventions |  | Done | 2026-01-28 | 2026-01-28 | User confirmation: target table is `workspace.default.college_scorecard`; map descriptions by existing column names to data.yaml | Single table only; no special casing/quoting rules beyond using existing column names. |
 | 1.2 | Document YAML schema used by `data.yaml` |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/data_yaml_schema.md` | Documented observed top-level keys, dictionary entry fields, and files schema. |
 | 2.1 | Create a CLI entrypoint and argument parser |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/cli.py`, `college_scorecard_pipeline/metadata/src/column_sync/__main__.py` | Added argparse CLI scaffolding with required catalog/schema/table/yaml and core flags. |
-| 2.2 | Add config loading for Databricks host/auth |  | Not Started |  |  |  |  |
+| 2.2 | Add config loading for Databricks host/auth |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/config.py`, `college_scorecard_pipeline/metadata/src/column_sync/cli.py` | Uses `DATABRICKS_HOST` plus `DATABRICKS_TOKEN` or `DATABRICKS_PROFILE`. |
 | 3.1 | Parse dictionary entries and normalize column names |  | Not Started |  |  |  |  |
 | 3.2 | Validate required fields (`source`, `description`) |  | Not Started |  |  |  |  |
 | 4.1 | Query current column comments from Unity Catalog |  | Not Started |  |  |  |  |
@@ -74,7 +74,7 @@ Rules:
 | 7.2 | Optional report file with per-column outcome |  | Not Started |  |  |  |  |
 | 8.1 | Unit tests for YAML parsing and diff logic |  | Not Started |  |  |  |  |
 | 8.2 | Mock API tests for update calls |  | Not Started |  |  |  |  |
-| 9.1 | Update README with CLI usage, examples, and auth setup |  | Not Started |  |  |  |  |
+| 9.1 | Update README with CLI usage, examples, and auth setup |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/README.md` | Added uv build steps and CLI usage with profile override examples. |
 
 ## AI Run Log
 
