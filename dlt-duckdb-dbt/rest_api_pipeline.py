@@ -4,7 +4,6 @@ from dlt.common.pendulum import pendulum
 from dlt.sources.rest_api import RESTAPIConfig, rest_api_resources
 
 
-
 @dlt.source(name="github")
 def github_source() -> Any:
     # Create a REST API configuration for the GitHub API
@@ -93,6 +92,13 @@ if __name__ == "__main__":
         destination="duckdb",
         dataset_name="rest_api_data",
     )
-    load_info = pipeline.run(github_source())
+
+    data = [
+        {"id": 1, "name": "Alice", "age": 30},
+        {"id": 2, "name": "Bob", "age": 25},
+        {"id": 3, "name": "Charlie", "age": 35},
+    ]
+    # load_info = pipeline.run(github_source())
+    load_info = pipeline.run(data, table_name="people")
 
     print(load_info)

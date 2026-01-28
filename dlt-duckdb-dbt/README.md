@@ -4,6 +4,8 @@
 * duckdb - In-process SQL database for analytical queries on local data
 * dbt - Framework for transforming data in duckdb for consumption
 
+### Incremental Append
+
 ```mermaid
 graph LR
     A[GitHub REST API] -->|dlt pipeline| B[(DuckDB Raw Data)]
