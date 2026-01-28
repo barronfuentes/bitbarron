@@ -6,6 +6,7 @@ import argparse
 import logging
 from typing import Sequence
 
+from column_sync.catalog import fetch_column_comments
 from column_sync.config import load_databricks_config, validate_databricks_credentials
 from column_sync.dictionary import load_dictionary_entries
 
@@ -13,9 +14,7 @@ from column_sync.dictionary import load_dictionary_entries
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="column-sync",
-        description=(
-            "Sync column descriptions in Databricks Unity Catalog with the data.yaml dictionary."
-        ),
+        description=("Sync column descriptions in Databricks Unity Catalog with the data.yaml dictionary."),
     )
 
     parser.add_argument(
@@ -95,7 +94,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     entries = load_dictionary_entries(args.yaml)
     logger.info("Loaded %s dictionary entries from %s.", len(entries), args.yaml)
-    # Functionality is implemented in later tasks.
+    column_comments = fetch_column_comments(
+        config,
+        args.catalog,
+        args.schema,
+        args.table,
+    )
+    logger.info("Fetched %s column comments.", len(column_comments))
     return 0
 
 

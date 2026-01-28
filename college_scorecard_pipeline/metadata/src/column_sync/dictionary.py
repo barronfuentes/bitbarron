@@ -28,9 +28,7 @@ def normalize_column_name(name: str) -> str:
     return name.strip().strip("`").strip().casefold()
 
 
-def load_dictionary_entries(
-    yaml_path: str | Path, *, validate_required: bool = True
-) -> list[DictionaryEntry]:
+def load_dictionary_entries(yaml_path: str | Path, *, validate_required: bool = True) -> list[DictionaryEntry]:
     """Load dictionary entries from a data.yaml file."""
 
     path = Path(yaml_path)
@@ -56,9 +54,7 @@ def load_dictionary_entries(
             continue
         source = payload.get("source")
         description = payload.get("description")
-        normalized_source = (
-            normalize_column_name(source) if isinstance(source, str) else None
-        )
+        normalized_source = normalize_column_name(source) if isinstance(source, str) else None
         entries.append(
             DictionaryEntry(
                 key=str(key),
@@ -92,9 +88,7 @@ def validate_required_fields(entries: list[DictionaryEntry]) -> None:
             ", ".join(missing_source),
         )
     if missing_description:
-        message_parts.append(
-            f"Missing description for {len(missing_description)} entries."
-        )
+        message_parts.append(f"Missing description for {len(missing_description)} entries.")
         logger.debug(
             "Entries missing description (%s): %s",
             len(missing_description),

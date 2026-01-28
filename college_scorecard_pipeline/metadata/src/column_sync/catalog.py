@@ -1,0 +1,116 @@
+"""Unity Catalog metadata access helpers."""
+
+from __future__ import annotations
+
+import json
+import logging
+from dataclasses import dataclass
+from typing import Any, Mapping
+from urllib import request
+from urllib.error import HTTPError, URLError
+
+from column_sync.config import DatabricksConfig
+from column_sync.dictionary import normalize_column_name
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class ColumnComment:
+    """Column comment metadata fetched from Unity Catalog."""
+
+    name: str
+    comment: str | None
+    normalized_name: str
+
+
+def fetch_table_metadata(
+    config: DatabricksConfig,
+    catalog: str,
+    schema: str,
+    table: str,
+    *,
+    timeout: int = 10,
+) -> dict[str, Any]:
+    """Fetch table metadata from Unity Catalog."""
+
+    full_name = f"{catalog}.{schema}.{table}"
+    url = f"{config.host.rstrip('/')}/api/2.1/unity-catalog/tables/{full_name}"
+    req = request.Request(url)
+    req.add_header("Authorization", f"Bearer {config.token}")
+    req.add_header("Accept", "application/json")
+
+    try:
+        with request.urlopen(req, timeout=timeout) as response:
+            payload = response.read().decode("utf-8")
+    except HTTPError as exc:
+        raise ValueError(f"Failed to fetch Unity Catalog table metadata for {full_name}. Status {exc.code}.") from exc
+    except URLError as exc:
+        raise ValueError("Unable to reach Databricks host when fetching table metadata.") from exc
+
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Databricks response for {full_name} was not valid JSON.") from exc
+
+    if not isinstance(data, dict):
+        raise ValueError(f"Databricks response for {full_name} was not a JSON object.")
+
+    return data
+
+
+def extract_column_comments(
+    table_payload: Mapping[str, Any],
+) -> list[ColumnComment]:
+    """Extract column comments from a Unity Catalog table payload."""
+
+    columns = table_payload.get("columns")
+    if not isinstance(columns, list):
+        raise ValueError("Databricks response missing 'columns' list.")
+
+    results: list[ColumnComment] = []
+    for column in columns:
+        if not isinstance(column, dict):
+            logger.warning("Skipping unexpected column payload: %r", column)
+            continue
+
+        name = column.get("name")
+        if not isinstance(name, str) or not name.strip():
+            logger.warning("Skipping column with invalid name: %r", column)
+            continue
+
+        comment = column.get("comment")
+        if not isinstance(comment, str) or not comment.strip():
+            comment = None
+
+        results.append(
+            ColumnComment(
+                name=name,
+                comment=comment,
+                normalized_name=normalize_column_name(name),
+            )
+        )
+
+    return results
+
+
+def fetch_column_comments(
+    config: DatabricksConfig,
+    catalog: str,
+    schema: str,
+    table: str,
+    *,
+    timeout: int = 10,
+) -> list[ColumnComment]:
+    """Fetch column comments for a Unity Catalog table."""
+
+    payload = fetch_table_metadata(
+        config,
+        catalog,
+        schema,
+        table,
+        timeout=timeout,
+    )
+    columns = extract_column_comments(payload)
+    logger.info("Fetched %s columns from %s.%s.%s.", len(columns), catalog, schema, table)
+    return columns

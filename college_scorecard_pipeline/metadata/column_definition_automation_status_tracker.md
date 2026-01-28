@@ -64,7 +64,7 @@ Rules:
 | 3.1 | Parse dictionary entries and normalize column names |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/dictionary.py`, `college_scorecard_pipeline/metadata/pyproject.toml` | Added YAML parser with normalized source names; PyYAML dependency registered. |
 | 3.2 | Validate required fields (`source`, `description`) |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/dictionary.py` | Added required-field validation with clear error messages; defaulted loader to validate. |
 | 3.3 | Wire dictionary loader into CLI to surface validation errors |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/cli.py` | CLI now loads dictionary at startup, surfacing validation errors before updates. |
-| 4.1 | Query current column comments from Unity Catalog |  | Not Started |  |  |  |  |
+| 4.1 | Query current column comments from Unity Catalog |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/catalog.py`, `college_scorecard_pipeline/metadata/src/column_sync/cli.py`, `college_scorecard_pipeline/metadata/tests/test_catalog.py` | Added Unity Catalog table fetch + column comment extraction; CLI now fetches column comments; tests cover fetch/extract error paths. |
 | 4.2 | Build a comparison map of existing vs desired comments |  | Not Started |  |  |  |  |
 | 5.1 | Implement REST call(s) to update column comments |  | Not Started |  |  |  |  |
 | 5.2 | Implement dry-run output |  | Not Started |  |  |  |  |

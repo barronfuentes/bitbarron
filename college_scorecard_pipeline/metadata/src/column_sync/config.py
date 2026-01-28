@@ -30,9 +30,7 @@ def load_databricks_config(profile_override: str | None = None) -> DatabricksCon
     return DatabricksConfig(host=host, token=token, profile=profile)
 
 
-def validate_databricks_credentials(
-    config: DatabricksConfig, catalog: str, schema: str, table: str
-) -> None:
+def validate_databricks_credentials(config: DatabricksConfig, catalog: str, schema: str, table: str) -> None:
     """Validate that credentials can access the target Unity Catalog table."""
 
     full_name = f"{catalog}.{schema}.{table}"
@@ -44,17 +42,11 @@ def validate_databricks_credentials(
     try:
         with request.urlopen(req, timeout=10) as response:
             if not (200 <= response.status < 300):
-                raise ValueError(
-                    f"Databricks auth validation failed with status {response.status}."
-                )
+                raise ValueError(f"Databricks auth validation failed with status {response.status}.")
     except HTTPError as exc:
-        raise ValueError(
-            f"Databricks auth validation failed with status {exc.code}."
-        ) from exc
+        raise ValueError(f"Databricks auth validation failed with status {exc.code}.") from exc
     except URLError as exc:
-        raise ValueError(
-            "Unable to reach Databricks host for auth validation."
-        ) from exc
+        raise ValueError("Unable to reach Databricks host for auth validation.") from exc
 
 
 def _load_profile(profile: str) -> tuple[str | None, str | None]:
@@ -72,9 +64,7 @@ def _load_profile(profile: str) -> tuple[str | None, str | None]:
         token = defaults.get("token")
     else:
         if not parser.has_section(profile):
-            raise ValueError(
-                f"Missing profile {profile!r} in ~/.databrickscfg."
-            )
+            raise ValueError(f"Missing profile {profile!r} in ~/.databrickscfg.")
         host = parser.get(profile, "host", fallback=None)
         token = parser.get(profile, "token", fallback=None)
 
@@ -84,13 +74,9 @@ def _load_profile(profile: str) -> tuple[str | None, str | None]:
         token = token.strip() or None
 
     if not host:
-        raise ValueError(
-            f"Missing host for profile {profile!r} in ~/.databrickscfg."
-        )
+        raise ValueError(f"Missing host for profile {profile!r} in ~/.databrickscfg.")
 
     if not token:
-        raise ValueError(
-            f"Missing token for profile {profile!r} in ~/.databrickscfg."
-        )
+        raise ValueError(f"Missing token for profile {profile!r} in ~/.databrickscfg.")
 
     return host, token
