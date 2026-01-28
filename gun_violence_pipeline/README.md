@@ -1,1 +1,4 @@
-Source Data https://github.com/jamesqo/gun-violence-data
+Source Data 
+
+* https://github.com/jamesqo/gun-violence-data
+
