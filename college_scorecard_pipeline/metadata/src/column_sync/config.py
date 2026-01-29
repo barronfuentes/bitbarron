@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import configparser
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import os
 from pathlib import Path
 from urllib import request
 from urllib.error import HTTPError, URLError
@@ -14,8 +15,9 @@ class DatabricksConfig:
     """Databricks host/auth configuration."""
 
     host: str
-    token: str | None
-    profile: str | None
+    profile: str | None = None
+    warehouse_id: str | None = None
+    token: str | None = field(default=None, repr=False)
 
 
 def load_databricks_config(profile_override: str | None = None) -> DatabricksConfig:
@@ -27,7 +29,10 @@ def load_databricks_config(profile_override: str | None = None) -> DatabricksCon
 
     profile = profile_override or "DEFAULT"
     host, token = _load_profile(profile)
-    return DatabricksConfig(host=host, token=token, profile=profile)
+    warehouse_id = os.getenv("DATABRICKS_WAREHOUSE_ID")
+    if warehouse_id:
+        warehouse_id = warehouse_id.strip() or None
+    return DatabricksConfig(host=host, token=token, profile=profile, warehouse_id=warehouse_id)
 
 
 def validate_databricks_credentials(config: DatabricksConfig, catalog: str, schema: str, table: str) -> None:

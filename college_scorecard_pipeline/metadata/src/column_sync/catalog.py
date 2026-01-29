@@ -5,12 +5,13 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 from urllib import request
 from urllib.error import HTTPError, URLError
 
 from column_sync.config import DatabricksConfig
 from column_sync.dictionary import normalize_column_name
+from column_sync.sql_execution import execute_statement
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +23,14 @@ class ColumnComment:
     name: str
     comment: str | None
     normalized_name: str
+
+
+@dataclass(frozen=True)
+class ColumnCommentUpdate:
+    """Column comment update payload."""
+
+    name: str
+    comment: str | None
 
 
 def fetch_table_metadata(
@@ -57,6 +66,56 @@ def fetch_table_metadata(
         raise ValueError(f"Databricks response for {full_name} was not a JSON object.")
 
     return data
+
+
+def update_column_comments(
+    config: DatabricksConfig,
+    catalog: str,
+    schema: str,
+    table: str,
+    updates: Iterable[ColumnCommentUpdate],
+    *,
+    timeout: int = 10,
+) -> None:
+    """Update column comments for a Unity Catalog table."""
+
+    updates_list = list(updates)
+    if not updates_list:
+        logger.info("No column comments to update for %s.%s.%s.", catalog, schema, table)
+        return
+
+    columns_payload = []
+    for update in updates_list:
+        name = update.name.strip() if isinstance(update.name, str) else ""
+        if not name:
+            raise ValueError("Column comment update requires a non-empty column name.")
+        columns_payload.append({"name": update.name, "comment": update.comment})
+
+    full_name = f"{catalog}.{schema}.{table}"
+    table_ref = ".".join(_escape_identifier(part) for part in (catalog, schema, table))
+
+    for update in columns_payload:
+        column_name = _escape_identifier(update["name"])
+        comment = update["comment"]
+        if comment is None:
+            comment_clause = "COMMENT NULL"
+        else:
+            comment_clause = f"COMMENT '{_escape_comment(comment)}'"
+        statement = f"ALTER TABLE {table_ref} ALTER COLUMN {column_name} {comment_clause}"
+        logger.info("Updating comment for %s.%s.%s.%s.", catalog, schema, table, update["name"])
+        execute_statement(config, statement, timeout=timeout)
+
+
+def _escape_identifier(identifier: str) -> str:
+    """Escape a Databricks identifier with backticks."""
+
+    return f"`{identifier.replace('`', '``')}`"
+
+
+def _escape_comment(comment: str) -> str:
+    """Escape single quotes in a comment string."""
+
+    return comment.replace("'", "''")
 
 
 def extract_column_comments(
