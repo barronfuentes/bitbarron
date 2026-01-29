@@ -6,7 +6,7 @@ import logging
 from dataclasses import dataclass
 
 from column_sync.catalog import ColumnCommentUpdate, update_column_comments
-from column_sync.compare import CommentComparison, ComparisonResult
+from column_sync.compare import CommentComparison, ComparisonResult, normalize_comment
 from column_sync.config import DatabricksConfig
 from column_sync.warehouse import ensure_warehouse_id
 
@@ -37,7 +37,7 @@ def build_comment_updates(
         if not comparison.desired_comment:
             missing_in_dictionary.append(comparison.column_name)
             continue
-        if _normalize_comment(comparison.desired_comment) == _normalize_comment(comparison.existing_comment):
+        if normalize_comment(comparison.desired_comment) == normalize_comment(comparison.existing_comment):
             no_change += 1
             continue
         updates.append(
@@ -87,8 +87,8 @@ def apply_comment_updates(
         missing_keys = ", ".join(entry.key for entry in result.missing_columns)
         logger.debug("Missing dictionary keys: %s", missing_keys)
 
-    warehouse_id = None
-    if updates:
+    warehouse_id = config.warehouse_id
+    if updates and not warehouse_id:
         warehouse_id = ensure_warehouse_id(config)
 
     updated = 0
@@ -128,11 +128,3 @@ def apply_comment_updates(
         missing_in_catalog=len(result.missing_columns),
         errors=errors,
     )
-
-
-def _normalize_comment(value: str | None) -> str | None:
-    """Normalize comment strings for comparison."""
-
-    if value is None:
-        return None
-    return str(value).strip() or None

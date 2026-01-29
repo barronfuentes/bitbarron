@@ -72,7 +72,7 @@ def test_apply_comment_updates_tracks_success_and_errors(monkeypatch) -> None:
             )
         ],
     )
-    config = DatabricksConfig(host="https://example", token="token")
+    config = DatabricksConfig(host="https://example", token="token", warehouse_id="test-warehouse")
     calls: list[str] = []
 
     def fake_update_column_comments(

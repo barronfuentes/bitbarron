@@ -31,6 +31,14 @@ class ComparisonResult:
     missing_columns: list[DictionaryEntry]
 
 
+def normalize_comment(value: str | None) -> str | None:
+    """Normalize comment strings for comparison."""
+
+    if value is None:
+        return None
+    return str(value).strip() or None
+
+
 def build_comment_comparisons(
     entries: list[DictionaryEntry],
     columns: list[ColumnComment],

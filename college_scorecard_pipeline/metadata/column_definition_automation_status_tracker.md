@@ -72,9 +72,3 @@ Rules:
 | 5.3 | Implement non-dry-run update execution (apply comparison results) |  | Done | 2026-01-29 | 2026-01-29 | `college_scorecard_pipeline/metadata/src/column_sync/update.py`, `college_scorecard_pipeline/metadata/src/column_sync/cli.py`, `college_scorecard_pipeline/metadata/tests/test_updates.py` | Tests not run (not requested). |
 | 8.2 | Mock API tests for update calls |  | Done | 2026-01-29 | 2026-01-29 | `college_scorecard_pipeline/metadata/tests/integration/test_databricks_integration.py`, `college_scorecard_pipeline/metadata/pyproject.toml` | Added on-demand integration test for Databricks column comment update; default pytest run excludes integration marker. |
 | 9.1 | Update README with CLI usage, examples, and auth setup |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/README.md` | Added uv build steps and CLI usage with profile override examples. |
-
-## AI Run Log
-
-| Run ID | Agent | Date | Scope | Outcome | Links/Artifacts | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  |  |  |

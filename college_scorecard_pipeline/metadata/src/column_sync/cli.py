@@ -46,21 +46,6 @@ def build_parser() -> argparse.ArgumentParser:
         help="Show intended updates without applying changes.",
     )
     parser.add_argument(
-        "--column-prefix",
-        default=None,
-        help="Only sync columns with this prefix.",
-    )
-    parser.add_argument(
-        "--columns",
-        default=None,
-        help="Comma-separated list of column names to include.",
-    )
-    parser.add_argument(
-        "--output",
-        default=None,
-        help="Optional path to write a JSON report of outcomes.",
-    )
-    parser.add_argument(
         "--profile",
         default=None,
         help="Databricks CLI profile name from ~/.databrickscfg (default: DEFAULT).",

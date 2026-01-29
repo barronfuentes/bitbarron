@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
-from column_sync.compare import CommentComparison, ComparisonResult
+from column_sync.compare import CommentComparison, ComparisonResult, normalize_comment
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ def build_dry_run_updates(comparisons: list[CommentComparison]) -> list[DryRunUp
     for comparison in comparisons:
         if not comparison.desired_comment:
             continue
-        if _normalize_comment(comparison.desired_comment) == _normalize_comment(comparison.existing_comment):
+        if normalize_comment(comparison.desired_comment) == normalize_comment(comparison.existing_comment):
             continue
         updates.append(
             DryRunUpdate(
@@ -54,7 +54,7 @@ def log_dry_run_plan(result: ComparisonResult) -> list[DryRunUpdate]:
             matched_missing += 1
             missing_in_dictionary.append(comparison.column_name)
             continue
-        if _normalize_comment(comparison.desired_comment) == _normalize_comment(comparison.existing_comment):
+        if normalize_comment(comparison.desired_comment) == normalize_comment(comparison.existing_comment):
             matched_no_change += 1
 
     logger.info(
@@ -96,11 +96,3 @@ def log_dry_run_plan(result: ComparisonResult) -> list[DryRunUpdate]:
         logger.debug("Missing dictionary keys: %s", missing_keys)
 
     return updates
-
-
-def _normalize_comment(value: str | None) -> str | None:
-    """Normalize comment strings for comparison."""
-
-    if value is None:
-        return None
-    return str(value).strip() or None
