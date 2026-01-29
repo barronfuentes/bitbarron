@@ -7,8 +7,10 @@ import logging
 from typing import Sequence
 
 from column_sync.catalog import fetch_column_comments
+from column_sync.compare import build_comment_comparisons
 from column_sync.config import load_databricks_config, validate_databricks_credentials
 from column_sync.dictionary import load_dictionary_entries
+from column_sync.dry_run import log_dry_run_plan
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -101,6 +103,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.table,
     )
     logger.info("Fetched %s column comments.", len(column_comments))
+    comparison = build_comment_comparisons(entries, column_comments)
+    if args.dry_run:
+        log_dry_run_plan(comparison)
+        return 0
     return 0
 
 
