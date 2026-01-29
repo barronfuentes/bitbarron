@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping
-from urllib import request
-from urllib.error import HTTPError, URLError
+
+from databricks.sdk.errors import DatabricksError
+from databricks.sdk.service.catalog import ColumnInfo
 
 from column_sync.config import DatabricksConfig
 from column_sync.dictionary import normalize_column_name
@@ -44,28 +44,12 @@ def fetch_table_metadata(
     """Fetch table metadata from Unity Catalog."""
 
     full_name = f"{catalog}.{schema}.{table}"
-    url = f"{config.host.rstrip('/')}/api/2.1/unity-catalog/tables/{full_name}"
-    req = request.Request(url)
-    req.add_header("Authorization", f"Bearer {config.token}")
-    req.add_header("Accept", "application/json")
-
     try:
-        with request.urlopen(req, timeout=timeout) as response:
-            payload = response.read().decode("utf-8")
-    except HTTPError as exc:
-        raise ValueError(f"Failed to fetch Unity Catalog table metadata for {full_name}. Status {exc.code}.") from exc
-    except URLError as exc:
-        raise ValueError("Unable to reach Databricks host when fetching table metadata.") from exc
+        table_info = config.client.tables.get(full_name)
+    except DatabricksError as exc:
+        raise ValueError(f"Failed to fetch Unity Catalog table metadata for {full_name}.") from exc
 
-    try:
-        data = json.loads(payload)
-    except json.JSONDecodeError as exc:
-        raise ValueError(f"Databricks response for {full_name} was not valid JSON.") from exc
-
-    if not isinstance(data, dict):
-        raise ValueError(f"Databricks response for {full_name} was not a JSON object.")
-
-    return data
+    return table_info.as_dict()
 
 
 def update_column_comments(
@@ -130,16 +114,20 @@ def extract_column_comments(
 
     results: list[ColumnComment] = []
     for column in columns:
-        if not isinstance(column, dict):
+        if isinstance(column, ColumnInfo):
+            name = column.name
+            comment = column.comment
+        elif isinstance(column, dict):
+            name = column.get("name")
+            comment = column.get("comment")
+        else:
             logger.warning("Skipping unexpected column payload: %r", column)
             continue
 
-        name = column.get("name")
         if not isinstance(name, str) or not name.strip():
             logger.warning("Skipping column with invalid name: %r", column)
             continue
 
-        comment = column.get("comment")
         if not isinstance(comment, str) or not comment.strip():
             comment = None
 

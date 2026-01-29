@@ -1,6 +1,6 @@
 ﻿# Column Sync (Metadata)
 
-CLI tool to sync column descriptions in Databricks Unity Catalog with the `data.yaml` dictionary.
+CLI tool to sync column descriptions in Databricks Unity Catalog with the `data.yaml` dictionary using the Databricks SDK.
 
 ## Build with uv
 
