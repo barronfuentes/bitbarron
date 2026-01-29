@@ -3,10 +3,10 @@ from __future__ import annotations
 from column_sync.compare import CommentComparison, ComparisonResult
 from column_sync.config import DatabricksConfig
 from column_sync.dictionary import DictionaryEntry
-from column_sync.update import apply_comment_updates, build_comment_updates
+from column_sync.update import apply_comment_updates, build_update_plan
 
 
-def test_build_comment_updates_filters_and_counts() -> None:
+def test_build_update_plan_filters_and_counts() -> None:
     comparisons = [
         CommentComparison(
             column_name="UNITID",
@@ -34,12 +34,12 @@ def test_build_comment_updates_filters_and_counts() -> None:
         ),
     ]
 
-    updates, missing, no_change = build_comment_updates(comparisons)
+    plan = build_update_plan(ComparisonResult(comparisons=comparisons, missing_columns=[]))
 
-    assert len(updates) == 1
-    assert updates[0].name == "UNITID"
-    assert missing == ["OPEID"]
-    assert no_change == 1
+    assert len(plan.updates) == 1
+    assert plan.updates[0].name == "UNITID"
+    assert plan.missing_in_dictionary == ["OPEID"]
+    assert plan.no_change == 1
 
 
 def test_apply_comment_updates_tracks_success_and_errors(monkeypatch) -> None:

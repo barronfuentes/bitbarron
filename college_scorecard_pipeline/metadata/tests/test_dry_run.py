@@ -4,10 +4,10 @@ import logging
 
 from column_sync.compare import CommentComparison, ComparisonResult
 from column_sync.dictionary import DictionaryEntry
-from column_sync.dry_run import build_dry_run_updates, log_dry_run_plan
+from column_sync.update import build_update_plan, log_dry_run_plan
 
 
-def test_build_dry_run_updates_filters_missing_desired_comment() -> None:
+def test_build_update_plan_filters_missing_desired_comment() -> None:
     comparisons = [
         CommentComparison(
             column_name="UNITID",
@@ -27,11 +27,11 @@ def test_build_dry_run_updates_filters_missing_desired_comment() -> None:
         ),
     ]
 
-    updates = build_dry_run_updates(comparisons)
+    plan = build_update_plan(ComparisonResult(comparisons=comparisons, missing_columns=[]))
 
-    assert len(updates) == 1
-    assert updates[0].column_name == "UNITID"
-    assert updates[0].desired_comment == "New"
+    assert len(plan.updates) == 1
+    assert plan.updates[0].name == "UNITID"
+    assert plan.updates[0].comment == "New"
 
 
 def test_log_dry_run_plan_logs_updates_and_missing_columns(caplog) -> None:
@@ -69,5 +69,6 @@ def test_log_dry_run_plan_logs_updates_and_missing_columns(caplog) -> None:
         updates = log_dry_run_plan(result)
 
     assert len(updates) == 1
+    assert updates[0].name == "UNITID"
     assert "Dry-run summary: 1 columns will be updated, 1 columns not matched in dictionary, 0 columns already match." in caplog.text
     assert "Columns not matched in dictionary (1): OPEID" in caplog.text
