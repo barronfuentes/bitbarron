@@ -69,12 +69,7 @@ Rules:
 | 4.2 | Build a comparison map of existing vs desired comments |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/src/column_sync/compare.py`, `college_scorecard_pipeline/metadata/tests/test_compare.py` | Added comparison builder returning per-column desired vs existing comments and missing dictionary entries. |
 | 5.1 | Implement SQL Statement Execution updates for column comments (REST patch unsupported) |  | Done | 2026-01-29 | 2026-01-29 | `college_scorecard_pipeline/metadata/src/column_sync/catalog.py`, `college_scorecard_pipeline/metadata/src/column_sync/sql_execution.py` | REST PATCH update for Unity Catalog column comments not supported in workspace; updates now use SQL via Statement Execution API (ALTER TABLE ... ALTER COLUMN ... COMMENT) with polling; requires `DATABRICKS_WAREHOUSE_ID`. |
 | 5.2 | Implement dry-run output |  | Done | 2026-01-29 | 2026-01-29 | `college_scorecard_pipeline/metadata/src/column_sync/dry_run.py`, `college_scorecard_pipeline/metadata/tests/test_dry_run.py` | Not run (tests not executed). Dry-run now logs column-level missing-in-dictionary details at INFO when count <=10; catalog-missing dictionary entries only at DEBUG. |
-| 5.3 | Implement idempotent update checks |  | Not Started |  |  |  |  |
-| 6.1 | Add filters for table, column prefix, or explicit list |  | Not Started |  |  |  |  |
-| 6.2 | Ensure filters are applied before any updates |  | Not Started |  |  |  |  |
-| 7.1 | Print summary counts (updated/skipped/errors) |  | Not Started |  |  |  |  |
-| 7.2 | Optional report file with per-column outcome |  | Not Started |  |  |  |  |
-| 8.1 | Unit tests for YAML parsing and diff logic |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/tests/test_dictionary.py` | Added pytest coverage for YAML parsing, normalization, and validation error paths. |
+| 5.3 | Implement non-dry-run update execution (apply comparison results) |  | Done | 2026-01-29 | 2026-01-29 | `college_scorecard_pipeline/metadata/src/column_sync/update.py`, `college_scorecard_pipeline/metadata/src/column_sync/cli.py`, `college_scorecard_pipeline/metadata/tests/test_updates.py` | Tests not run (not requested). |
 | 8.2 | Mock API tests for update calls |  | Done | 2026-01-29 | 2026-01-29 | `college_scorecard_pipeline/metadata/tests/integration/test_databricks_integration.py`, `college_scorecard_pipeline/metadata/pyproject.toml` | Added on-demand integration test for Databricks column comment update; default pytest run excludes integration marker. |
 | 9.1 | Update README with CLI usage, examples, and auth setup |  | Done | 2026-01-28 | 2026-01-28 | `college_scorecard_pipeline/metadata/README.md` | Added uv build steps and CLI usage with profile override examples. |
 

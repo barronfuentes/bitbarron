@@ -11,6 +11,7 @@ from column_sync.compare import build_comment_comparisons
 from column_sync.config import load_databricks_config, validate_databricks_credentials
 from column_sync.dictionary import load_dictionary_entries
 from column_sync.dry_run import log_dry_run_plan
+from column_sync.update import apply_comment_updates
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -107,6 +108,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.dry_run:
         log_dry_run_plan(comparison)
         return 0
+    summary = apply_comment_updates(
+        config,
+        args.catalog,
+        args.schema,
+        args.table,
+        comparison,
+    )
+    if summary.errors:
+        return 1
     return 0
 
 

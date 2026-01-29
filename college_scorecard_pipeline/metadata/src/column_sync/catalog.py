@@ -75,7 +75,8 @@ def update_column_comments(
     table: str,
     updates: Iterable[ColumnCommentUpdate],
     *,
-    timeout: int = 10,
+    timeout: int = 120,
+    warehouse_id: str | None = None,
 ) -> None:
     """Update column comments for a Unity Catalog table."""
 
@@ -103,7 +104,7 @@ def update_column_comments(
             comment_clause = f"COMMENT '{_escape_comment(comment)}'"
         statement = f"ALTER TABLE {table_ref} ALTER COLUMN {column_name} {comment_clause}"
         logger.info("Updating comment for %s.%s.%s.%s.", catalog, schema, table, update["name"])
-        execute_statement(config, statement, timeout=timeout)
+        execute_statement(config, statement, timeout=timeout, warehouse_id=warehouse_id)
 
 
 def _escape_identifier(identifier: str) -> str:
