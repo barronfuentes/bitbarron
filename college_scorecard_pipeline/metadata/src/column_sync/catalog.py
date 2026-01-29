@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Iterable, Mapping
+from typing import Iterable
 
 from databricks.sdk.errors import DatabricksError
 from databricks.sdk.service.catalog import ColumnInfo
@@ -33,25 +33,6 @@ class ColumnCommentUpdate:
     comment: str | None
 
 
-def fetch_table_metadata(
-    config: DatabricksConfig,
-    catalog: str,
-    schema: str,
-    table: str,
-    *,
-    timeout: int = 10,
-) -> dict[str, Any]:
-    """Fetch table metadata from Unity Catalog."""
-
-    full_name = f"{catalog}.{schema}.{table}"
-    try:
-        table_info = config.client.tables.get(full_name)
-    except DatabricksError as exc:
-        raise ValueError(f"Failed to fetch Unity Catalog table metadata for {full_name}.") from exc
-
-    return table_info.as_dict()
-
-
 def update_column_comments(
     config: DatabricksConfig,
     catalog: str,
@@ -76,7 +57,6 @@ def update_column_comments(
             raise ValueError("Column comment update requires a non-empty column name.")
         columns_payload.append({"name": update.name, "comment": update.comment})
 
-    full_name = f"{catalog}.{schema}.{table}"
     table_ref = ".".join(_escape_identifier(part) for part in (catalog, schema, table))
 
     for update in columns_payload:
@@ -103,14 +83,8 @@ def _escape_comment(comment: str) -> str:
     return comment.replace("'", "''")
 
 
-def extract_column_comments(
-    table_payload: Mapping[str, Any],
-) -> list[ColumnComment]:
-    """Extract column comments from a Unity Catalog table payload."""
-
-    columns = table_payload.get("columns")
-    if not isinstance(columns, list):
-        raise ValueError("Databricks response missing 'columns' list.")
+def extract_column_comments(columns: Iterable[ColumnInfo | dict[str, object]]) -> list[ColumnComment]:
+    """Extract column comments from Unity Catalog column payloads."""
 
     results: list[ColumnComment] = []
     for column in columns:
@@ -152,13 +126,12 @@ def fetch_column_comments(
 ) -> list[ColumnComment]:
     """Fetch column comments for a Unity Catalog table."""
 
-    payload = fetch_table_metadata(
-        config,
-        catalog,
-        schema,
-        table,
-        timeout=timeout,
-    )
-    columns = extract_column_comments(payload)
+    full_name = f"{catalog}.{schema}.{table}"
+    try:
+        table_info = config.client.tables.get(full_name)
+    except DatabricksError as exc:
+        raise ValueError(f"Failed to fetch Unity Catalog table metadata for {full_name}.") from exc
+
+    columns = extract_column_comments(table_info.columns or [])
     logger.info("Fetched %s columns from %s.%s.%s.", len(columns), catalog, schema, table)
     return columns

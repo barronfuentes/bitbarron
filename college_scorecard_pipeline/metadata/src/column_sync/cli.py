@@ -7,10 +7,9 @@ import logging
 from typing import Sequence
 
 from column_sync.catalog import fetch_column_comments
-from column_sync.compare import build_comment_comparisons
 from column_sync.config import load_databricks_config, validate_databricks_credentials
 from column_sync.dictionary import load_dictionary_entries
-from column_sync.update import apply_comment_updates, log_dry_run_plan
+from column_sync.update import apply_comment_updates, build_comment_comparisons, log_dry_run_plan
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from column_sync.compare import CommentComparison, ComparisonResult
+from column_sync.update import CommentComparison, ComparisonResult
 from databricks.sdk import WorkspaceClient
 
 from column_sync.config import DatabricksConfig

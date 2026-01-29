@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from column_sync.compare import CommentComparison, ComparisonResult
+from column_sync.update import CommentComparison, ComparisonResult
 from column_sync.dictionary import DictionaryEntry
 from column_sync.update import build_update_plan, log_dry_run_plan
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from column_sync.catalog import ColumnComment
-from column_sync.compare import build_comment_comparisons
+from column_sync.update import build_comment_comparisons
 from column_sync.dictionary import DictionaryEntry
 
 
