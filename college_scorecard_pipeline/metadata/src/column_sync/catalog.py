@@ -42,6 +42,8 @@ def update_column_comments(
     *,
     timeout: int = 120,
     warehouse_id: str | None = None,
+    progress_index: int | None = None,
+    progress_total: int | None = None,
 ) -> None:
     """Update column comments for a Unity Catalog table."""
 
@@ -59,7 +61,11 @@ def update_column_comments(
 
     table_ref = ".".join(_escape_identifier(part) for part in (catalog, schema, table))
 
-    for update in columns_payload:
+    total_updates = len(columns_payload)
+    use_progress_override = (
+        progress_index is not None and progress_total is not None and total_updates == 1
+    )
+    for index, update in enumerate(columns_payload, start=1):
         column_name = _escape_identifier(update["name"])
         comment = update["comment"]
         if comment is None:
@@ -67,7 +73,20 @@ def update_column_comments(
         else:
             comment_clause = f"COMMENT '{_escape_comment(comment)}'"
         statement = f"ALTER TABLE {table_ref} ALTER COLUMN {column_name} {comment_clause}"
-        logger.info("Updating comment for %s.%s.%s.%s.", catalog, schema, table, update["name"])
+        if use_progress_override:
+            index = progress_index
+            total = progress_total
+        else:
+            total = total_updates
+        logger.info(
+            "Updating comment (%s/%s) for %s.%s.%s.%s.",
+            index,
+            total,
+            catalog,
+            schema,
+            table,
+            update["name"],
+        )
         execute_statement(config, statement, timeout=timeout, warehouse_id=warehouse_id)
 
 

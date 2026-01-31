@@ -213,7 +213,8 @@ def apply_comment_updates(
 
     updated = 0
     errors = 0
-    for update in plan.updates:
+    total_updates = len(plan.updates)
+    for index, update in enumerate(plan.updates, start=1):
         try:
             update_column_comments(
                 config,
@@ -222,6 +223,8 @@ def apply_comment_updates(
                 table,
                 [update],
                 warehouse_id=warehouse_id,
+                progress_index=index,
+                progress_total=total_updates,
             )
             updated += 1
         except ValueError as exc:
