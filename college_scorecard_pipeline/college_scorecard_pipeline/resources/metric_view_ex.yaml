@@ -1,0 +1,38 @@
+version: 1.1
+source: default.college_scorecard
+filter: INSTNM LIKE 'The University of Texas%'
+
+dimensions:
+  - name: instnm
+    expr: INSTNM
+  - name: school_year_start
+    expr: school_year_start
+
+measures:
+  - name: adm_rate_avg
+    expr: AVG(TRY_CAST(NULLIF(ADM_RATE, 'NA') AS DOUBLE))
+    comment: Average admission rate.
+
+  - name: npt4_pub_avg
+    expr: AVG(TRY_CAST(NULLIF(NPT4_PUB, 'NA') AS DOUBLE))
+    comment: Average net price for public institutions.
+
+  - name: pctpell_avg
+    expr: AVG(TRY_CAST(NULLIF(PCTPELL, 'NA') AS DOUBLE))
+    comment: Average Pell Grant share.
+
+  - name: ugds_white_avg
+    expr: AVG(TRY_CAST(NULLIF(UGDS_WHITE, 'NA') AS DOUBLE))
+    comment: Average share of white undergraduate degree-seeking students.
+
+  - name: ugds_black_avg
+    expr: AVG(TRY_CAST(NULLIF(UGDS_BLACK, 'NA') AS DOUBLE))
+    comment: Average share of Black undergraduate degree-seeking students.
+
+  - name: ugds_hisp_avg
+    expr: AVG(TRY_CAST(NULLIF(UGDS_HISP, 'NA') AS DOUBLE))
+    comment: Average share of Hispanic undergraduate degree-seeking students.
+
+  - name: ugds_asian_avg
+    expr: AVG(TRY_CAST(NULLIF(UGDS_ASIAN, 'NA') AS DOUBLE))
+    comment: Average share of Asian undergraduate degree-seeking students.
