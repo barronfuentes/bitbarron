@@ -1,0 +1,43 @@
+# Databricks asset bundle for Nest thermostat bronze ingestion.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: nest_thermostat_pipeline
+  uuid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+include:
+  - resources/*.yml
+
+# Variable declarations. These are assigned in the dev/prod targets below.
+variables:
+  catalog:
+    description: The catalog to use
+  schema:
+    description: The schema to use
+  bronze_table:
+    description: Name of the bronze Delta table
+    default: bronze_nest_hvac_runtime
+  volume_path:
+    description: Path to the landing volume containing JSONL files
+    default: /Volumes/workspace/barronfuentes/nest_thermostat_takeout
+
+targets:
+  dev:
+    # Development mode creates a prefixed copy and pauses schedules.
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-3064731d-4903.cloud.databricks.com
+    variables:
+      catalog: workspace
+      schema: ${workspace.current_user.short_name}
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-3064731d-4903.cloud.databricks.com
+      root_path: /Workspace/Users/barronfuentes@gmail.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: workspace
+      schema: prod
+    permissions:
+      - user_name: barronfuentes@gmail.com
+        level: CAN_MANAGE
