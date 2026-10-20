@@ -1,0 +1,25 @@
+# Pipeline: Bronze Nest HVAC Runtime Ingestion (Spark Declarative Pipeline)
+# Reads CSV-quoted JSONL files from a landing volume, unescapes CSV quoting,
+# parses JSON, adds provenance metadata, and writes a bronze streaming table.
+
+resources:
+  pipelines:
+    bronze_nest_hvac_runtime_sdp:
+      name: bronze_nest_hvac_runtime_sdp
+
+      catalog: ${var.catalog}
+      target: ${var.schema}
+
+      libraries:
+        - glob:
+            include: ../src/pipelines/bronze_nest_hvac_runtime/**
+
+      root_path: ../src/pipelines/bronze_nest_hvac_runtime
+
+      serverless: true
+      photon: true
+      channel: current
+
+      configuration:
+        volume_path: ${var.volume_path}
+        bronze_table: ${var.bronze_table}
